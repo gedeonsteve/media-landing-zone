@@ -18,7 +18,7 @@ This implementation intentionally avoids AWS Control Tower in favor of a fully T
 
 ## Architecture
 
-![Architecture Diagram](./docs/diagrams/architecture.png)
+![Architecture Diagram](./docs/diagrams/architecture.svg)
 
 ### Organizational Structure
 
