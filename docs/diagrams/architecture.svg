@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 780" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif">
+
+  <!-- Background -->
+  <rect width="1100" height="780" fill="#f7f9fc"/>
+
+  <!-- Title -->
+  <text x="550" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#1a202c">AWS Multi-Account Landing Zone — Architecture</text>
+  <text x="550" y="62" text-anchor="middle" font-size="12" fill="#718096">Media Broadcast Operations Platform</text>
+
+  <!-- AWS Organization wrapper -->
+  <rect x="40" y="90" width="1020" height="660" rx="12" fill="#ffffff" stroke="#FF9900" stroke-width="3"/>
+  <rect x="40" y="90" width="220" height="32" rx="12" fill="#FF9900"/>
+  <text x="60" y="111" font-size="13" font-weight="700" fill="#ffffff">AWS Organization (Root)</text>
+
+  <!-- Management Account -->
+  <rect x="70" y="140" width="220" height="100" rx="8" fill="#FFF4E6" stroke="#FF9900" stroke-width="2"/>
+  <text x="180" y="165" text-anchor="middle" font-size="13" font-weight="700" fill="#7B341E">MANAGEMENT ACCOUNT</text>
+  <text x="180" y="185" text-anchor="middle" font-size="11" fill="#7B341E">Billing</text>
+  <text x="180" y="201" text-anchor="middle" font-size="11" fill="#7B341E">IAM Identity Center</text>
+  <text x="180" y="217" text-anchor="middle" font-size="11" fill="#7B341E">Account Vending (Service Catalog)</text>
+  <text x="180" y="233" text-anchor="middle" font-size="11" fill="#7B341E">Organization Trail</text>
+
+  <!-- SCPs box -->
+  <rect x="310" y="140" width="200" height="100" rx="8" fill="#FEF3E2" stroke="#D69E2E" stroke-width="2"/>
+  <text x="410" y="165" text-anchor="middle" font-size="13" font-weight="700" fill="#744210">SERVICE CONTROL POLICIES</text>
+  <text x="410" y="183" text-anchor="middle" font-size="10" fill="#744210">• Deny root user actions</text>
+  <text x="410" y="197" text-anchor="middle" font-size="10" fill="#744210">• Region restriction (eu-west-3)</text>
+  <text x="410" y="211" text-anchor="middle" font-size="10" fill="#744210">• Deny CloudTrail disabling</text>
+  <text x="410" y="225" text-anchor="middle" font-size="10" fill="#744210">• Require encryption</text>
+
+  <!-- Identity Provider -->
+  <rect x="530" y="140" width="200" height="100" rx="8" fill="#E8F4FE" stroke="#2B6CB0" stroke-width="2"/>
+  <text x="630" y="165" text-anchor="middle" font-size="13" font-weight="700" fill="#1A365D">IDENTITY FEDERATION</text>
+  <text x="630" y="185" text-anchor="middle" font-size="11" fill="#1A365D">IAM Identity Center</text>
+  <text x="630" y="201" text-anchor="middle" font-size="11" fill="#1A365D">+ External IdP (Okta/AzureAD)</text>
+  <text x="630" y="217" text-anchor="middle" font-size="11" fill="#1A365D">Permission Sets per Role</text>
+  <text x="630" y="233" text-anchor="middle" font-size="11" fill="#1A365D">SSO across all accounts</text>
+
+  <!-- GitHub OIDC -->
+  <rect x="750" y="140" width="200" height="100" rx="8" fill="#F7FAFC" stroke="#4A5568" stroke-width="2"/>
+  <text x="850" y="165" text-anchor="middle" font-size="13" font-weight="700" fill="#1A202C">CI/CD INTEGRATION</text>
+  <text x="850" y="185" text-anchor="middle" font-size="11" fill="#1A202C">GitHub Actions</text>
+  <text x="850" y="201" text-anchor="middle" font-size="11" fill="#1A202C">OIDC Federation (no static keys)</text>
+  <text x="850" y="217" text-anchor="middle" font-size="11" fill="#1A202C">Terraform Plan on PR</text>
+  <text x="850" y="233" text-anchor="middle" font-size="11" fill="#1A202C">Apply on merge (with approval)</text>
+
+  <!-- ===== Security OU ===== -->
+  <rect x="70" y="270" width="300" height="200" rx="10" fill="#FED7D7" stroke="#C53030" stroke-width="2"/>
+  <rect x="70" y="270" width="120" height="28" rx="10" fill="#C53030"/>
+  <text x="80" y="289" font-size="12" font-weight="700" fill="#ffffff">SECURITY OU</text>
+
+  <rect x="85" y="310" width="270" height="70" rx="6" fill="#ffffff" stroke="#C53030" stroke-width="1"/>
+  <text x="220" y="330" text-anchor="middle" font-size="12" font-weight="700" fill="#742A2A">Log Archive Account</text>
+  <text x="220" y="347" text-anchor="middle" font-size="10" fill="#742A2A">Centralized CloudTrail logs</text>
+  <text x="220" y="361" text-anchor="middle" font-size="10" fill="#742A2A">S3 with Object Lock (WORM)</text>
+  <text x="220" y="375" text-anchor="middle" font-size="10" fill="#742A2A">KMS encryption + Athena</text>
+
+  <rect x="85" y="390" width="270" height="70" rx="6" fill="#ffffff" stroke="#C53030" stroke-width="1"/>
+  <text x="220" y="410" text-anchor="middle" font-size="12" font-weight="700" fill="#742A2A">Security Account</text>
+  <text x="220" y="427" text-anchor="middle" font-size="10" fill="#742A2A">GuardDuty (delegated admin)</text>
+  <text x="220" y="441" text-anchor="middle" font-size="10" fill="#742A2A">Security Hub aggregator</text>
+  <text x="220" y="455" text-anchor="middle" font-size="10" fill="#742A2A">AWS Config + Inspector</text>
+
+  <!-- ===== Infrastructure OU ===== -->
+  <rect x="390" y="270" width="300" height="200" rx="10" fill="#C6F6D5" stroke="#2F855A" stroke-width="2"/>
+  <rect x="390" y="270" width="160" height="28" rx="10" fill="#2F855A"/>
+  <text x="400" y="289" font-size="12" font-weight="700" fill="#ffffff">INFRASTRUCTURE OU</text>
+
+  <rect x="405" y="310" width="270" height="70" rx="6" fill="#ffffff" stroke="#2F855A" stroke-width="1"/>
+  <text x="540" y="330" text-anchor="middle" font-size="12" font-weight="700" fill="#22543D">Network Account</text>
+  <text x="540" y="347" text-anchor="middle" font-size="10" fill="#22543D">Transit Gateway (hub)</text>
+  <text x="540" y="361" text-anchor="middle" font-size="10" fill="#22543D">Centralized egress + NAT</text>
+  <text x="540" y="375" text-anchor="middle" font-size="10" fill="#22543D">Route 53 Resolver, AWS Network FW</text>
+
+  <rect x="405" y="390" width="270" height="70" rx="6" fill="#ffffff" stroke="#2F855A" stroke-width="1"/>
+  <text x="540" y="410" text-anchor="middle" font-size="12" font-weight="700" fill="#22543D">Shared Services Account</text>
+  <text x="540" y="427" text-anchor="middle" font-size="10" fill="#22543D">Route 53 private hosted zones</text>
+  <text x="540" y="441" text-anchor="middle" font-size="10" fill="#22543D">ACM Private CA</text>
+  <text x="540" y="455" text-anchor="middle" font-size="10" fill="#22543D">ECR pull-through cache</text>
+
+  <!-- ===== Workloads OU ===== -->
+  <rect x="710" y="270" width="320" height="200" rx="10" fill="#BEE3F8" stroke="#2B6CB0" stroke-width="2"/>
+  <rect x="710" y="270" width="140" height="28" rx="10" fill="#2B6CB0"/>
+  <text x="720" y="289" font-size="12" font-weight="700" fill="#ffffff">WORKLOADS OU</text>
+
+  <!-- Non-Prod sub-OU -->
+  <rect x="725" y="310" width="290" height="70" rx="6" fill="#ffffff" stroke="#2B6CB0" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="870" y="328" text-anchor="middle" font-size="11" font-weight="700" fill="#1A365D">Non-Prod OU</text>
+  <line x1="740" y1="338" x2="1000" y2="338" stroke="#2B6CB0" stroke-width="0.5" stroke-dasharray="2,2"/>
+  <rect x="735" y="345" width="135" height="28" rx="4" fill="#EBF8FF" stroke="#2B6CB0" stroke-width="0.5"/>
+  <text x="802" y="363" text-anchor="middle" font-size="10" fill="#1A365D">Dev Account</text>
+  <rect x="880" y="345" width="135" height="28" rx="4" fill="#EBF8FF" stroke="#2B6CB0" stroke-width="0.5"/>
+  <text x="947" y="363" text-anchor="middle" font-size="10" fill="#1A365D">Staging Account</text>
+
+  <!-- Prod sub-OU -->
+  <rect x="725" y="390" width="290" height="70" rx="6" fill="#ffffff" stroke="#2B6CB0" stroke-width="2"/>
+  <text x="870" y="410" text-anchor="middle" font-size="12" font-weight="700" fill="#1A365D">Prod OU</text>
+  <rect x="735" y="420" width="280" height="30" rx="4" fill="#EBF8FF" stroke="#2B6CB0" stroke-width="1"/>
+  <text x="875" y="440" text-anchor="middle" font-size="11" font-weight="600" fill="#1A365D">Production Account (Broadcast Channels)</text>
+
+  <!-- ===== Cross-cutting layer ===== -->
+  <rect x="70" y="500" width="960" height="100" rx="10" fill="#FAF5FF" stroke="#6B46C1" stroke-width="2"/>
+  <rect x="70" y="500" width="220" height="28" rx="10" fill="#6B46C1"/>
+  <text x="80" y="519" font-size="12" font-weight="700" fill="#ffffff">CROSS-CUTTING SERVICES</text>
+
+  <rect x="85" y="540" width="220" height="50" rx="6" fill="#ffffff" stroke="#6B46C1" stroke-width="1"/>
+  <text x="195" y="558" text-anchor="middle" font-size="11" font-weight="700" fill="#44337A">Centralized Logging</text>
+  <text x="195" y="575" text-anchor="middle" font-size="10" fill="#44337A">CloudTrail → S3 (Log Archive)</text>
+
+  <rect x="320" y="540" width="220" height="50" rx="6" fill="#ffffff" stroke="#6B46C1" stroke-width="1"/>
+  <text x="430" y="558" text-anchor="middle" font-size="11" font-weight="700" fill="#44337A">Network Hub</text>
+  <text x="430" y="575" text-anchor="middle" font-size="10" fill="#44337A">TGW peering across accounts</text>
+
+  <rect x="555" y="540" width="220" height="50" rx="6" fill="#ffffff" stroke="#6B46C1" stroke-width="1"/>
+  <text x="665" y="558" text-anchor="middle" font-size="11" font-weight="700" fill="#44337A">Security Posture</text>
+  <text x="665" y="575" text-anchor="middle" font-size="10" fill="#44337A">GuardDuty / SecurityHub agg.</text>
+
+  <rect x="790" y="540" width="225" height="50" rx="6" fill="#ffffff" stroke="#6B46C1" stroke-width="1"/>
+  <text x="902" y="558" text-anchor="middle" font-size="11" font-weight="700" fill="#44337A">Account Baseline</text>
+  <text x="902" y="575" text-anchor="middle" font-size="10" fill="#44337A">Applied via Terraform on vending</text>
+
+  <!-- ===== Legend ===== -->
+  <rect x="70" y="625" width="960" height="100" rx="8" fill="#ffffff" stroke="#CBD5E0" stroke-width="1"/>
+  <text x="85" y="648" font-size="12" font-weight="700" fill="#1A202C">Key Design Principles</text>
+
+  <text x="85" y="672" font-size="10" fill="#2D3748">• <tspan font-weight="600">Account isolation as security boundary</tspan> — each workload account is a hard blast-radius limit</text>
+  <text x="85" y="687" font-size="10" fill="#2D3748">• <tspan font-weight="600">Centralized observability</tspan> — all CloudTrail logs flow to Log Archive, all findings to Security Hub aggregator</text>
+  <text x="85" y="702" font-size="10" fill="#2D3748">• <tspan font-weight="600">SCPs at OU level</tspan> — preventive controls applied uniformly, no per-account exception management</text>
+  <text x="85" y="717" font-size="10" fill="#2D3748">• <tspan font-weight="600">Network hub-and-spoke</tspan> — single Transit Gateway, centralized egress to reduce NAT Gateway costs</text>
+
+</svg>
