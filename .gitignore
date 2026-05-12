@@ -1,2 +1,120 @@
-.tfvars
+# ============================================================================
+# Terraform
+# ============================================================================
+# Local .terraform directories (provider plugins, modules)
+**/.terraform/*
+
+# .tfstate files (state should be in S3, never in Git)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Variable definition files that may contain sensitive data
+# Commit *.tfvars files only if they don't contain secrets.
+# Uncomment the next line to ignore all .tfvars by default:
+# *.tfvars
+*.tfvars.json
+
+# Plan output files
+*.tfplan
+*.tfplan.json
+tfplan
+tfplan.binary
+
+# Override files (typically used locally)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# CLI configuration files
+.terraformrc
+terraform.rc
+
+# Lock file (commit this if you want pinned versions, ignore if you want flexibility)
+# Common practice: commit .terraform.lock.hcl for reproducible builds
+# .terraform.lock.hcl
+
+# ============================================================================
+# AWS Credentials — NEVER COMMIT
+# ============================================================================
+.aws/
 credentials
+*credentials*.csv
+aws-credentials*
+
+# ============================================================================
+# Secrets and environment files
+# ============================================================================
+.env
+.env.*
+!.env.example
+secrets.yaml
+secrets.json
+*.pem
+*.key
+!*.pub.key
+
+# ============================================================================
+# Operating system files
+# ============================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ============================================================================
+# Editors and IDEs
+# ============================================================================
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.vim/
+
+# ============================================================================
+# Python (for OPA tests, Lambda code, helper scripts)
+# ============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.coverage
+.venv/
+venv/
+env/
+
+# ============================================================================
+# Node (in case of any JS tooling)
+# ============================================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ============================================================================
+# Build artifacts
+# ============================================================================
+dist/
+build/
+out/
+
+# ============================================================================
+# Logs
+# ============================================================================
+*.log
+logs/
