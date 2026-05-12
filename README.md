@@ -22,7 +22,7 @@ This implementation intentionally avoids AWS Control Tower in favor of a fully T
 
 ### Organizational Structure
 
-\`\`\`
+```
 Root
 ├── Security OU
 │   ├── Log Archive Account     (centralized CloudTrail logs)
@@ -36,11 +36,11 @@ Root
     │   └── Staging Account
     └── Prod OU
         └── Production Account
-\`\`\`
+```
 
 ## Project Structure
 
-\`\`\`
+```
 .
 ├── terraform/
 │   ├── 00-bootstrap/        # S3 backend + DynamoDB lock
@@ -60,7 +60,7 @@ Root
 │   ├── COST-ANALYSIS.md
 │   └── RUNBOOK.md
 └── .github/workflows/        # CI/CD pipelines
-\`\`\`
+```
 
 ## Getting Started
 
@@ -74,18 +74,20 @@ Root
 ### Quick Start
 
 1. Bootstrap the Terraform backend:
-   \`\`\`bash
+
+   ```bash
    cd terraform/00-bootstrap
    terraform init
    terraform apply
-   \`\`\`
+   ```
 
 2. Deploy the AWS Organization and OUs:
-   \`\`\`bash
+
+   ```bash
    cd ../01-organization
    terraform init
    terraform apply
-   \`\`\`
+   ```
 
 3. Follow the deployment order in [DEPLOYMENT.md](./docs/DEPLOYMENT.md)
 
