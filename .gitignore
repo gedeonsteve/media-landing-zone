@@ -16,7 +16,7 @@ crash.*.log
 # Variable definition files that may contain sensitive data
 # Commit *.tfvars files only if they don't contain secrets.
 # Uncomment the next line to ignore all .tfvars by default:
-# *.tfvars
+*.tfvars
 *.tfvars.json
 
 # Plan output files

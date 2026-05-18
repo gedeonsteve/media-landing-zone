@@ -1,0 +1,15 @@
+# Copy this file to terraform.tfvars and fill in your actual values.
+# terraform.tfvars is gitignored — never commit secrets or account-specific data.
+
+# REQUIRED: your GitHub username or organization
+github_owner = "gedeonsteve"
+
+# REQUIRED: outputs from the 00-bootstrap module
+# Get them by running, from the bootstrap folder:
+#   terraform output tfstate_bucket_arn
+#   terraform output tfstate_lock_table_arn  → then convert to ARN
+#   terraform output tfstate_kms_key_arn
+
+tfstate_bucket_arn     = "arn:aws:s3:::media-landing-zone-tfstate-XXXXXXXXXXXX"
+tfstate_lock_table_arn = "arn:aws:dynamodb:eu-west-3:XXXXXXXXXXXX:table/media-landing-zone-tfstate-lock"
+tfstate_kms_key_arn    = "arn:aws:kms:eu-west-3:XXXXXXXXXXXX:key/abcd1234-..."
