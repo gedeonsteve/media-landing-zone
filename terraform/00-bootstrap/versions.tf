@@ -27,7 +27,7 @@ terraform {
   # ----------------------------------------------------------------------------
 
   backend "s3" {
-    bucket         = "media-landing-zone-tfstate-821650122484"                  # from tfstate_bucket_name output
+    bucket         = "media-landing-zone-tfstate-021502749428"                  # from tfstate_bucket_name output
     key            = "00-bootstrap/terraform.tfstate"
     region         = "eu-west-3"
     dynamodb_table = "media-landing-zone-tfstate-lock"
