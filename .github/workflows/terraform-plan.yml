@@ -1,0 +1,192 @@
+name: Terraform Plan
+
+# Runs on every Pull Request that modifies Terraform code.
+# Posts the plan output as a PR comment so reviewers can see what will change.
+
+on:
+  pull_request:
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-plan.yml'
+
+# Required for OIDC authentication to AWS, and to comment on PRs.
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+env:
+  TF_VERSION: "1.15.2"
+  AWS_REGION: "eu-west-3"
+  AWS_ROLE_ARN: ${{ vars.AWS_PLAN_ROLE_ARN }}
+
+jobs:
+  detect-changes:
+    name: Detect changed Terraform modules
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_changes: ${{ steps.set-matrix.outputs.has_changes }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine which modules changed
+        id: set-matrix
+        run: |
+          # List all directly-affected directories under terraform/
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD \
+            | grep '^terraform/' \
+            | awk -F'/' '{print $1"/"$2}' \
+            | sort -u \
+            | jq -R . | jq -s -c .)
+
+          if [ "$CHANGED" = "[]" ] || [ -z "$CHANGED" ]; then
+            echo "No Terraform changes detected."
+            echo "matrix=[]" >> $GITHUB_OUTPUT
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changed modules: $CHANGED"
+            echo "matrix=$CHANGED" >> $GITHUB_OUTPUT
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          fi
+
+  validate-and-plan:
+    name: Plan ${{ matrix.module }}
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has_changes == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJSON(needs.detect-changes.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: ${{ matrix.module }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      # OIDC authentication — no static credentials anywhere
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ env.AWS_ROLE_ARN }}
+          role-session-name: github-actions-plan-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Install tflint
+        uses: terraform-linters/setup-tflint@v4
+        with:
+          tflint_version: latest
+
+      - name: tflint
+        id: tflint
+        run: |
+          tflint --init
+          tflint --format=compact
+        continue-on-error: true
+
+      - name: Install tfsec
+        uses: aquasecurity/tfsec-action@v1.0.3
+        with:
+          working_directory: ${{ matrix.module }}
+          soft_fail: true
+
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set +e
+          terraform plan -no-color -input=false -out=tfplan 2>&1 | tee plan_output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+
+          # Truncate the plan output for the PR comment (GitHub limit ~65k chars)
+          head -c 60000 plan_output.txt > plan_truncated.txt
+          if [ "$(wc -c < plan_output.txt)" -gt 60000 ]; then
+            echo "" >> plan_truncated.txt
+            echo "... (output truncated, see full logs in the workflow run)" >> plan_truncated.txt
+          fi
+
+          exit $EXIT_CODE
+
+      - name: Comment plan on PR
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          MODULE: ${{ matrix.module }}
+          FMT_OUTCOME: ${{ steps.fmt.outcome }}
+          INIT_OUTCOME: ${{ steps.init.outcome }}
+          VALIDATE_OUTCOME: ${{ steps.validate.outcome }}
+          TFLINT_OUTCOME: ${{ steps.tflint.outcome }}
+          PLAN_OUTCOME: ${{ steps.plan.outcome }}
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const planFile = path.join(process.env.MODULE, 'plan_truncated.txt');
+            let planOutput = '';
+            try {
+              planOutput = fs.readFileSync(planFile, 'utf8');
+            } catch (e) {
+              planOutput = '(no plan output captured)';
+            }
+
+            const statusIcon = (outcome) => {
+              if (outcome === 'success') return '✅';
+              if (outcome === 'failure') return '❌';
+              return '⚠️';
+            };
+
+            const body = `## 📋 Terraform Plan — \`${process.env.MODULE}\`
+
+            | Step | Status |
+            |------|--------|
+            | 🎨 Format | ${statusIcon(process.env.FMT_OUTCOME)} ${process.env.FMT_OUTCOME} |
+            | 🔧 Init | ${statusIcon(process.env.INIT_OUTCOME)} ${process.env.INIT_OUTCOME} |
+            | ✔️ Validate | ${statusIcon(process.env.VALIDATE_OUTCOME)} ${process.env.VALIDATE_OUTCOME} |
+            | 🔍 tflint | ${statusIcon(process.env.TFLINT_OUTCOME)} ${process.env.TFLINT_OUTCOME} |
+            | 📐 Plan | ${statusIcon(process.env.PLAN_OUTCOME)} ${process.env.PLAN_OUTCOME} |
+
+            <details><summary>📐 Plan output</summary>
+
+            \`\`\`hcl
+            ${planOutput}
+            \`\`\`
+
+            </details>
+
+            *Pusher: @${{ github.actor }} · Workflow: [${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Fail job if plan failed
+        if: steps.plan.outputs.exit_code != '0'
+        run: exit 1
