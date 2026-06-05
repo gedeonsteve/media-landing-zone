@@ -49,6 +49,8 @@ locals {
     ManagedBy   = "Terraform"
     Component   = "Bootstrap"
     Environment = "shared"
+    Owner       = "gedeonsteve"
+    Repository  = "media-landing-zone"
   }
 }
 
